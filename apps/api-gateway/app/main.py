@@ -29,6 +29,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Elio API Gateway", version="0.1.0", lifespan=lifespan)
 
+@app.get("/")
+async def root_health():
+    return {"status": "ok", "service": "elio-api-gateway"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,3 +48,11 @@ app.include_router(predictions.router, prefix="/api/v1")
 app.include_router(actions.router, prefix="/api/v1")
 app.include_router(machines.router, prefix="/api/v1")
 app.include_router(demo.router)
+
+@app.get("/{path:path}")
+async def catch_all(path: str):
+    return {
+        "message": "Path not found by any router",
+        "requested_path": path,
+        "available_routes": [r.path for r in app.routes]
+    }
