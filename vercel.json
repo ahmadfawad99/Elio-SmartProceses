@@ -1,12 +1,14 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "apps/dashboard/package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/demo/(.*)",
+      "destination": "/api/index.py"
+    },
     {
       "source": "/(.*)",
       "destination": "/apps/dashboard/$1"

@@ -107,46 +107,85 @@ export default function Home() {
   const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
+    let pollInterval: NodeJS.Timeout;
+
     const connect = () => {
       const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/demo/ws";
-      ws.current = new WebSocket(wsUrl);
+      
+      // If we are on a wss/ws protocol, try to connect
+      if (wsUrl.startsWith("ws")) {
+        ws.current = new WebSocket(wsUrl);
 
-      ws.current.onopen = () => {
-        setConnected(true);
-        console.log("Connected to Elio Backend");
-      };
+        ws.current.onopen = () => {
+          setConnected(true);
+          console.log("Connected to Elio Backend via WebSocket");
+        };
 
-      ws.current.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.type === "initial_state") {
-          setReadings(msg.data.readings);
-          setHistory(msg.data.history);
-        } else if (msg.type === "metrics_update") {
-          setReadings(msg.data);
-          setHistory(prev => {
-            const next = { ...prev };
-            msg.data.forEach((r: Reading) => {
-              const h = [...(next[r.rack_id] || []), r];
-              next[r.rack_id] = h.slice(-30);
+        ws.current.onmessage = (event) => {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "initial_state") {
+            setReadings(msg.data.readings);
+            setHistory(msg.data.history);
+          } else if (msg.type === "metrics_update") {
+            setReadings(msg.data);
+            setHistory(prev => {
+              const next = { ...prev };
+              msg.data.forEach((r: Reading) => {
+                const h = [...(next[r.rack_id] || []), r];
+                next[r.rack_id] = h.slice(-30);
+              });
+              return next;
             });
-            return next;
-          });
-        } else if (msg.type === "agent_event") {
-          setAgentLogs(prev => [msg.data, ...prev].slice(0, 10));
-        } else if (msg.type === "work_order") {
-          setWorkOrders(prev => [msg.data, ...prev].slice(0, 5));
+          } else if (msg.type === "agent_event") {
+            setAgentLogs(prev => [msg.data, ...prev].slice(0, 10));
+          } else if (msg.type === "work_order") {
+            setWorkOrders(prev => [msg.data, ...prev].slice(0, 5));
+          }
+        };
+
+        ws.current.onclose = () => {
+          setConnected(false);
+          console.log("WebSocket Disconnected. Switching to Polling...");
+          startPolling();
+        };
+
+        ws.current.onerror = () => {
+           console.log("WebSocket error. Switching to Polling...");
+           ws.current?.close();
+        }
+      } else {
+        startPolling();
+      }
+    };
+
+    const startPolling = () => {
+      if (pollInterval) return;
+      console.log("Starting Telemetry Polling...");
+      
+      const doPoll = async () => {
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+          const res = await fetch(`${apiUrl}/demo/telemetry`);
+          const data = await res.json();
+          setConnected(true);
+          setReadings(data.readings);
+          setHistory(data.history);
+        } catch (err) {
+          setConnected(false);
+          console.error("Polling failed", err);
         }
       };
 
-      ws.current.onclose = () => {
-        setConnected(false);
-        console.log("Disconnected. Reconnecting...");
-        setTimeout(connect, 2000);
-      };
+      doPoll();
+      pollInterval = setInterval(doPoll, 2000);
     };
 
     connect();
-    return () => ws.current?.close();
+
+    return () => {
+      ws.current?.close();
+      if (pollInterval) clearInterval(pollInterval);
+    };
   }, []);
 
   const simulateFault = async (rack_id: string, type: string) => {

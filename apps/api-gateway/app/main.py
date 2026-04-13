@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import asyncio
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import actions, anomalies, health, ingestion, machines, predictions, demo
@@ -8,19 +9,23 @@ from .ws_manager import manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Start background sensor simulation
-    async def simulation_loop():
-        while True:
-            readings = simulator.generate_all_readings()
-            await manager.broadcast({
-                "type": "metrics_update",
-                "data": readings
-            })
-            await asyncio.sleep(2) # Update every 2 seconds
-            
-    loop_task = asyncio.create_task(simulation_loop())
-    yield
-    loop_task.cancel()
+    # Only start background simulation if NOT on Vercel
+    # Vercel doesn't support persistent background tasks in serverless functions
+    if not os.environ.get("VERCEL"):
+        async def simulation_loop():
+            while True:
+                readings = simulator.generate_all_readings()
+                await manager.broadcast({
+                    "type": "metrics_update",
+                    "data": readings
+                })
+                await asyncio.sleep(2)
+                
+        loop_task = asyncio.create_task(simulation_loop())
+        yield
+        loop_task.cancel()
+    else:
+        yield
 
 app = FastAPI(title="Elio API Gateway", version="0.1.0", lifespan=lifespan)
 

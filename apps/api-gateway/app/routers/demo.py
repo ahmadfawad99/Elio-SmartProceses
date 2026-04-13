@@ -50,3 +50,14 @@ async def simulate_fault(rack_id: str, fault_type: str, background_tasks: Backgr
 async def clear_faults():
     simulator.clear_faults()
     return {"status": "faults_cleared"}
+
+@router.get("/telemetry")
+async def get_telemetry():
+    # In serverless mode, we generate a new reading on each poll
+    # to maintain the "live" feel
+    readings = simulator.generate_all_readings()
+    return {
+        "readings": readings,
+        "history": simulator.get_all_history(),
+        "active_faults": simulator.get_active_faults()
+    }
