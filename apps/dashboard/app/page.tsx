@@ -108,7 +108,8 @@ export default function Home() {
 
   useEffect(() => {
     const connect = () => {
-      ws.current = new WebSocket("ws://localhost:8000/demo/ws");
+      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/demo/ws";
+      ws.current = new WebSocket(wsUrl);
 
       ws.current.onopen = () => {
         setConnected(true);
@@ -150,7 +151,8 @@ export default function Home() {
 
   const simulateFault = async (rack_id: string, type: string) => {
     try {
-      await fetch(`http://localhost:8000/demo/simulate-fault?rack_id=${rack_id}&fault_type=${type}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      await fetch(`${apiUrl}/demo/simulate-fault?rack_id=${rack_id}&fault_type=${type}`, {
         method: "POST",
       });
     } catch (err) {
@@ -159,7 +161,8 @@ export default function Home() {
   };
 
   const clearFaults = async () => {
-    await fetch("http://localhost:8000/demo/clear-faults", { method: "POST" });
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    await fetch(`${apiUrl}/demo/clear-faults`, { method: "POST" });
     setAgentLogs([]);
     setWorkOrders([]);
   };
