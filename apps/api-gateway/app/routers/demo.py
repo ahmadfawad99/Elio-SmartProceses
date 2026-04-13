@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/demo", tags=["demo"])
+router = APIRouter(prefix="/api/demo", tags=["demo"])
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

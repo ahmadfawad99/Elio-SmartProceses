@@ -110,7 +110,12 @@ export default function Home() {
     let pollInterval: NodeJS.Timeout;
 
     const connect = () => {
-      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/demo/ws";
+      let wsUrl = process.env.NEXT_PUBLIC_WS_URL;
+      if (!wsUrl && typeof window !== 'undefined') {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${protocol}//${window.location.host}/api/demo/ws`;
+      }
+      wsUrl = wsUrl || "ws://localhost:8000/api/demo/ws";
       
       // If we are on a wss/ws protocol, try to connect
       if (wsUrl.startsWith("ws")) {
@@ -164,8 +169,8 @@ export default function Home() {
       
       const doPoll = async () => {
         try {
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-          const res = await fetch(`${apiUrl}/demo/telemetry`);
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+          const res = await fetch(`${apiUrl}/api/demo/telemetry`);
           const data = await res.json();
           setConnected(true);
           setReadings(data.readings);
@@ -190,8 +195,8 @@ export default function Home() {
 
   const simulateFault = async (rack_id: string, type: string) => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-      await fetch(`${apiUrl}/demo/simulate-fault?rack_id=${rack_id}&fault_type=${type}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+      await fetch(`${apiUrl}/api/demo/simulate-fault?rack_id=${rack_id}&fault_type=${type}`, {
         method: "POST",
       });
     } catch (err) {
@@ -200,8 +205,8 @@ export default function Home() {
   };
 
   const clearFaults = async () => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    await fetch(`${apiUrl}/demo/clear-faults`, { method: "POST" });
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    await fetch(`${apiUrl}/api/demo/clear-faults`, { method: "POST" });
     setAgentLogs([]);
     setWorkOrders([]);
   };

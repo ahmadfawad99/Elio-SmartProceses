@@ -6,10 +6,6 @@
       "destination": "/api/index.py"
     },
     {
-      "source": "/demo/(.*)",
-      "destination": "/api/index.py"
-    },
-    {
       "source": "/(.*)",
       "destination": "/apps/dashboard/$1"
     }
