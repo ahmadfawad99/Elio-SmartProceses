@@ -1,0 +1,17 @@
+pyproject.toml
+app/__init__.py
+app/main.py
+app/routers/__init__.py
+app/routers/actions.py
+app/routers/anomalies.py
+app/routers/health.py
+app/routers/ingestion.py
+app/routers/machines.py
+app/routers/predictions.py
+app/services/__init__.py
+app/services/store.py
+elio_api_gateway.egg-info/PKG-INFO
+elio_api_gateway.egg-info/SOURCES.txt
+elio_api_gateway.egg-info/dependency_links.txt
+elio_api_gateway.egg-info/requires.txt
+elio_api_gateway.egg-info/top_level.txt

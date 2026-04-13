@@ -1,0 +1,8 @@
+pyproject.toml
+app/__init__.py
+app/main.py
+elio_action_runner.egg-info/PKG-INFO
+elio_action_runner.egg-info/SOURCES.txt
+elio_action_runner.egg-info/dependency_links.txt
+elio_action_runner.egg-info/requires.txt
+elio_action_runner.egg-info/top_level.txt

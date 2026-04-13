@@ -1,0 +1,12 @@
+pyproject.toml
+app/__init__.py
+app/main.py
+app/services/__init__.py
+app/services/anomaly.py
+app/services/features.py
+app/services/prediction.py
+elio_analytics.egg-info/PKG-INFO
+elio_analytics.egg-info/SOURCES.txt
+elio_analytics.egg-info/dependency_links.txt
+elio_analytics.egg-info/requires.txt
+elio_analytics.egg-info/top_level.txt

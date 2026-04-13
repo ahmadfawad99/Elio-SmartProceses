@@ -1,0 +1,11 @@
+pyproject.toml
+elio_shared.egg-info/PKG-INFO
+elio_shared.egg-info/SOURCES.txt
+elio_shared.egg-info/dependency_links.txt
+elio_shared.egg-info/requires.txt
+elio_shared.egg-info/top_level.txt
+shared/__init__.py
+shared/config.py
+shared/enums.py
+shared/models.py
+shared/schemas.py

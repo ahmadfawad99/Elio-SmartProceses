@@ -1,0 +1,12 @@
+pyproject.toml
+app/__init__.py
+app/main.py
+app/services/__init__.py
+app/services/agent_pipeline.py
+app/services/agents.py
+app/services/protocol.py
+elio_orchestrator.egg-info/PKG-INFO
+elio_orchestrator.egg-info/SOURCES.txt
+elio_orchestrator.egg-info/dependency_links.txt
+elio_orchestrator.egg-info/requires.txt
+elio_orchestrator.egg-info/top_level.txt
